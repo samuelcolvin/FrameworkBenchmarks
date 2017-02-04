@@ -50,10 +50,11 @@ async def startup(app: web.Application):
     max_connections = 2000  # from toolset/setup/linux/databases/postgresql/postgresql.conf
     # 10 gives us a little leeway, more than about 160 connections doesn't seem to help
     max_size = max(160, int(max_connections / workers - 10))
+    min_size = max_size // 2
     if CONNECTION_ORM:
-        app['pg'] = await aiopg.sa.create_engine(dsn=dsn, minsize=max_size, maxsize=max_size, loop=app.loop)
+        app['pg'] = await aiopg.sa.create_engine(dsn=dsn, minsize=min_size, maxsize=max_size, loop=app.loop)
     else:
-        app['pg'] = await asyncpg.create_pool(dsn=dsn, min_size=max_size, max_size=max_size, loop=app.loop)
+        app['pg'] = await asyncpg.create_pool(dsn=dsn, min_size=min_size, max_size=max_size, loop=app.loop)
 
 
 async def cleanup(app: web.Application):
