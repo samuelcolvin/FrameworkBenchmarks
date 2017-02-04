@@ -1,5 +1,4 @@
 import os
-import multiprocessing
 from pathlib import Path
 
 import aiohttp_jinja2
@@ -44,13 +43,7 @@ def pg_dsn() -> str:
 
 async def startup(app: web.Application):
     dsn = pg_dsn()
-    # work out how many connection we're allowed in the pool
-
-    workers = multiprocessing.cpu_count()  # number of works gunicorn starts
-    max_connections = 2000  # from toolset/setup/linux/databases/postgresql/postgresql.conf
-    # 10 gives us a little leeway, more than about 160 connections doesn't seem to help
-    max_size = max(160, int(max_connections / workers - 10))
-    min_size = max_size // 2
+    min_size, max_size = 50, 100
     if CONNECTION_ORM:
         app['pg'] = await aiopg.sa.create_engine(dsn=dsn, minsize=min_size, maxsize=max_size, loop=app.loop)
     else:
