@@ -80,8 +80,8 @@ def setup_routes(app):
         app.router.add_get('/updates/{queries:.*}', updates_raw)
 
 
-def create_app(loop):
-    app = web.Application(loop=loop)
+def create_app():
+    app = web.Application(handler_args=dict(max_concurrent_handlers=1))
 
     jinja2_loader = jinja2.FileSystemLoader(str(THIS_DIR / 'templates'))
     aiohttp_jinja2.setup(app, loader=jinja2_loader)
